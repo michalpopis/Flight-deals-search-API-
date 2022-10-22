@@ -1,10 +1,12 @@
 from data_manager import DataManager
 from flight_search import FlightSearch
 from datetime import datetime, timedelta
+from notification_manager import NotificationManager
 
 data_manager = DataManager()
 sheet_data = data_manager.get_destination_data()
 flight_search = FlightSearch()
+message = NotificationManager()
 
 ORIGIN_CITY_IATA = "Your City IATA Code"
 
@@ -24,4 +26,16 @@ for destination in sheet_data:
         from_time=tomorrow.strftime("%d/%m/%Y"),
         to_time=in_six_months.strftime("%d/%m/%Y"),
     )
-    
+    if flight and flight.airline == "FR":
+        if destination["lowestPrice"] > flight.price:
+            message.send_msg(flight.price, flight.origin_city, flight.origin_airport, flight.destination_city,
+                             flight.destination_airport, flight.out_date, flight.return_date, airline="RyanAir")
+    elif flight and flight.airline == "W6":
+        if destination["lowestPrice"] > flight.price:
+            message.send_msg(flight.price, flight.origin_city, flight.origin_airport, flight.destination_city,
+                             flight.destination_airport, flight.out_date, flight.return_date, airline="WizzAir")
+    else:
+        if flight and destination["lowestPrice"] > flight.price:
+            message.send_msg(flight.price, flight.origin_city, flight.origin_airport, flight.destination_city,
+                             flight.destination_airport, flight.out_date, flight.return_date, flight.airline)
+                             
